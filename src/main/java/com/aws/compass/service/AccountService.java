@@ -12,6 +12,7 @@ import com.aws.compass.repository.AccountMapper;
 import com.aws.compass.security.PrincipalUser;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +33,9 @@ public class AccountService {
     private final JavaMailSender javaMailSender;
     private final JwtProvider jwtProvider;
     private final AuthService authService;
+
+    @Value("${server.serverAddress}")
+    private String serverAddress;
 
     public boolean updateUser(int userId, EditUserReqDto editUserReqDto) {
         User newUser = editUserReqDto.toUser();
@@ -72,7 +76,7 @@ public class AccountService {
                     "<div>" +
                             "<h1>학습 나침반 이메일 인증 메일</h1>"+
                             "<p>이메일 인증을 완료하려면 아래의 버튼을 클릭하세요.</p>" +
-                            "<a href=\"http://localhost:8080/api/account/auth/email?token=" + token + "\">인증하기</a>" +
+                            "<a href=\"http://" + ("localhost".equals(serverAddress) ? "localhost:8080" : serverAddress) + "/api/account/auth/email?token=" + token + "\">인증하기</a>" +
                     "</div>", "utf-8", "html"
             );
             javaMailSender.send(mimeMailMessage);       //설정한 메시지를 sender를 통해 전달함
